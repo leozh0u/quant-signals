@@ -17,6 +17,7 @@ dev = [
 
 [project.scripts]
 qs-ingest = "qsignals.ingest.cli:main"
+qs-news = "qsignals.ingest.news_cli:main"
 
 [build-system]
 requires = ["hatchling"]
