@@ -18,6 +18,18 @@ Plan A was Stooq: free CSV, no key, full history per symbol. I wrote the fetcher
 
 Plan B is Yahoo's public v8 chart endpoint, called directly with requests instead of through the yfinance package. It's a single GET returning JSON, and when Yahoo inevitably changes something I'd rather debug my own 60-line client than someone else's scraper. The endpoint needs a browser-ish User-Agent and has undocumented rate limits, so: 1s sleep between requests, small universe. One real gotcha handled in code: timestamps come back in UTC and have to be converted to the exchange timezone before taking the date, or bars can land on the wrong day. A second: `range=max&interval=1d` silently comes back as monthly bars, which I only caught because AAPL "since 1984" had 168 rows. The client now requests explicit period1/period2 epochs and rejects any response whose reported granularity isn't 1d. A second source later is still the plan, since cross-source disagreement is itself useful data.
 
+## 2026-07-13: adj_close added after catching an unadjusted-price bug
+
+The first schema stored Yahoo's `quote.close` only. Momentum on raw closes would have printed a fake -90% NVDA day at the 2024 split. Yahoo's chart prices turn out to be split-adjusted already, but not dividend-adjusted, so the schema now carries `adjclose` (total-return adjusted) in its own column and all return math uses it. Raw close stays for reference. Local db wiped and re-pulled since prices are fully backfillable.
+
+## 2026-07-13: Backtester contract is a weights panel
+
+Every strategy is a date x ticker DataFrame of target close-of-day weights; the engine applies `weights.shift(1) * returns` so day-t decisions earn day t+1. One line owns the no-lookahead guarantee and one test locks it. Baselines and random nulls go through identical cost math, so comparisons can't diverge by construction. Rejected an event-driven order simulator: at daily frequency it's extra machinery with nothing to say until there's an intraday fill model, which is out of scope.
+
+## 2026-07-13: Random null gets turnover-matched
+
+A daily-redrawn random long-short churns ~2x the momentum signal and its costs bury it, which makes "beats random" free. The null now redraws every k days with k chosen as the smallest hold whose turnover is at or below the signal's. This moved the null's p95 net Sharpe from silly to plausible and is the difference between a real kill line and theater.
+
 ## 2026-07-13: Start ingest before anything else
 
 History depth only grows with calendar time. Features and the backtester can be built against whatever has accumulated; the reverse isn't true.

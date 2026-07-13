@@ -7,10 +7,12 @@ Can news sentiment plus price history predict short-horizon equity moves? Probab
 Early. The ingest layer works and data is accumulating; features and the backtester come next.
 
 - [x] Daily OHLCV ingest (Yahoo chart API) into DuckDB, append-only with dedupe
+- [x] Vectorized backtester with cost model and no-lookahead tests
+- [x] Baselines: buy-and-hold, momentum, random signal at matched turnover
+- [x] First result: H1 (20d momentum) is dead, writeup in HYPOTHESES.md
 - [ ] Headline ingest
-- [ ] Feature engineering (returns, vol, momentum lags)
-- [ ] Baselines: buy-and-hold, momentum, random signal at matched turnover
-- [ ] Walk-forward backtester with cost model
+- [ ] Feature engineering beyond momentum (vol, reversal, lags)
+- [ ] Walk-forward fitting harness for parameterized models
 - [ ] Sentiment features from headline embeddings
 
 ## Ground rules
@@ -35,10 +37,14 @@ Ingest is idempotent. Rows already in the database are skipped on re-run, and ev
 ## Layout
 
 ```
-src/qsignals/db.py       DuckDB schema and append-only writes
-src/qsignals/ingest/     data pulls (Yahoo daily bars, CLI runner)
-tests/                   pytest suite
-universe.txt             tickers under study
-HYPOTHESES.md            pre-registered signal hypotheses
-DECISIONS.md             engineering decision log
+src/qsignals/db.py        DuckDB schema and append-only writes
+src/qsignals/ingest/      data pulls (Yahoo daily bars, CLI runner)
+src/qsignals/panel.py     bars -> wide date x ticker price panels
+src/qsignals/signals.py   strategies as target-weight panels
+src/qsignals/backtest.py  vectorized engine: shift(1), costs, Sharpe, drawdown
+experiments/              one runnable script per hypothesis
+tests/                    pytest suite (incl. an explicit no-lookahead test)
+universe.txt              tickers under study
+HYPOTHESES.md             pre-registered signal hypotheses and results
+DECISIONS.md              engineering decision log
 ```
