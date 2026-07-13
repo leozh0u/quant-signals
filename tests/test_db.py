@@ -21,6 +21,7 @@ def make_bars(ticker="AAPL", dates=("2024-01-02", "2024-01-03")):
             "high": 101.0,
             "low": 99.0,
             "close": 100.5,
+            "adj_close": 100.5,
             "volume": 1_000_000,
             "source": "test",
         }

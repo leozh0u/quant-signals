@@ -38,7 +38,12 @@ def fetch_daily(ticker: str, session: requests.Session | None = None) -> pd.Data
     sess = session or requests.Session()
     resp = sess.get(
         f"{BASE_URL}{ticker.upper()}",
-        params={"period1": 0, "period2": 9_999_999_999, "interval": "1d"},
+        params={
+            "period1": 0,
+            "period2": 9_999_999_999,
+            "interval": "1d",
+            "events": "div,split",
+        },
         headers=_HEADERS,
         timeout=30,
     )
@@ -52,6 +57,7 @@ def fetch_daily(ticker: str, session: requests.Session | None = None) -> pd.Data
         result = payload["result"][0]
         timestamps = result["timestamp"]
         quote = result["indicators"]["quote"][0]
+        adjclose = result["indicators"]["adjclose"][0]["adjclose"]
         tz = result["meta"]["exchangeTimezoneName"]
     except (KeyError, IndexError, TypeError) as exc:
         raise YahooError(f"{ticker}: malformed response ({exc!r})") from exc
@@ -67,6 +73,7 @@ def fetch_daily(ticker: str, session: requests.Session | None = None) -> pd.Data
             "high": quote["high"],
             "low": quote["low"],
             "close": quote["close"],
+            "adj_close": adjclose,
             "volume": quote["volume"],
         }
     )

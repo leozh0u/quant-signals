@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS bars (
     high        DOUBLE,
     low         DOUBLE,
     close       DOUBLE,
+    adj_close   DOUBLE,
     volume      BIGINT,
     source      VARCHAR NOT NULL,
     ingested_at TIMESTAMP NOT NULL DEFAULT current_timestamp
@@ -35,7 +36,7 @@ CREATE TABLE IF NOT EXISTS ingest_log (
 );
 """
 
-BAR_COLUMNS = ["ticker", "date", "open", "high", "low", "close", "volume", "source"]
+BAR_COLUMNS = ["ticker", "date", "open", "high", "low", "close", "adj_close", "volume", "source"]
 
 
 def connect(path: str | Path) -> duckdb.DuckDBPyConnection:
@@ -60,7 +61,7 @@ def insert_bars(con: duckdb.DuckDBPyConnection, frame: pd.DataFrame) -> int:
     before = con.execute("SELECT count(*) FROM bars").fetchone()[0]
     con.execute(
         """
-        INSERT INTO bars (ticker, date, open, high, low, close, volume, source)
+        INSERT INTO bars (ticker, date, open, high, low, close, adj_close, volume, source)
         SELECT s.* FROM staged s
         ANTI JOIN bars b ON b.ticker = s.ticker AND b.date = s.date
         """
