@@ -1,14 +1,107 @@
-# Starting universe: liquid US large caps across sectors, plus two ETFs
-# for benchmark/regime context. Deliberately small while ingest is young.
-SPY   # S&P 500 ETF, benchmark
-QQQ   # Nasdaq 100 ETF
+# Roughly the S&P 100 as of mid-2026, plus SPY/QQQ for benchmark context.
+# Known limitation, on purpose: this is today's index membership, so any
+# backtest over it has survivorship bias (delisted losers are missing).
+# Results get read as "on names that survived", and HYPOTHESES.md entries
+# carry the caveat. Fixing it properly needs point-in-time membership data,
+# which free sources don't provide.
+SPY   # benchmark ETF
+QQQ   # benchmark ETF
 AAPL
 MSFT
 NVDA
 AMZN
 GOOGL
 META
+TSLA
+AVGO
+BRK-B
 JPM
-XOM
+LLY
+V
 UNH
+XOM
+MA
+COST
+HD
 PG
+JNJ
+WMT
+NFLX
+ABBV
+CRM
+BAC
+ORCL
+CVX
+WFC
+KO
+CSCO
+ACN
+AMD
+PEP
+LIN
+MCD
+IBM
+DIS
+TMO
+ABT
+ADBE
+GE
+PM
+CAT
+INTU
+VZ
+QCOM
+TXN
+BKNG
+SPGI
+ISRG
+RTX
+T
+NEE
+LOW
+AMGN
+PFE
+UNP
+HON
+COP
+NKE
+UPS
+SBUX
+AXP
+BLK
+GS
+MS
+DE
+BMY
+MDT
+SCHW
+LMT
+ADP
+GILD
+CVS
+MRSH
+TJX
+AMT
+SYK
+C
+ETN
+CB
+PLD
+BSX
+ZTS
+SO
+PANW
+MU
+FISV
+DUK
+ICE
+SHW
+CL
+EMR
+GD
+FDX
+PGR
+TGT
+APD
+BDX
+CME
