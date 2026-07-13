@@ -1,21 +1,26 @@
-"""H1: does 20-day cross-sectional momentum survive costs? (HYPOTHESES.md)
+"""Does 20-day cross-sectional momentum survive costs? (H1, H2 in HYPOTHESES.md)
 
 Runs the momentum long-short against buy-and-hold and a 200-draw random null
 with turnover matched via the hold parameter, then prints per-year net Sharpe
 so one lucky stretch can't carry the headline number.
 
-    python experiments/h1_momentum.py --db data/market.duckdb
+    # H1 (original 10 mega caps):
+    python experiments/momentum.py --tickers AAPL MSFT NVDA AMZN GOOGL META JPM XOM UNH PG
+    # H2 (full universe file; ETFs excluded automatically):
+    python experiments/momentum.py --universe universe.txt
 """
 
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 import numpy as np
 
 from qsignals import backtest, db, panel, signals
+from qsignals.ingest.cli import read_universe
 
-STOCKS = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "JPM", "XOM", "UNH", "PG"]
+ETFS = {"SPY", "QQQ"}
 N_NULL = 200
 COST_BPS = 10.0
 
@@ -36,13 +41,23 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--db", default="data/market.duckdb")
     parser.add_argument("--start", default="2000-01-01", help="skip pre-2000 sparse history")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--universe", type=Path)
+    group.add_argument("--tickers", nargs="+")
+    parser.add_argument(
+        "--flip", action="store_true", help="reversal book: long losers, short winners (H3)"
+    )
     args = parser.parse_args()
 
+    stocks = [t for t in (args.tickers or read_universe(args.universe)) if t not in ETFS]
     con = db.connect(args.db)
-    prices = panel.adj_close_panel(con, STOCKS)
+    prices = panel.adj_close_panel(con, stocks)
     prices = prices.loc[args.start :]
 
-    mom = backtest.run(signals.momentum_ls(prices, lookback=20), prices, COST_BPS)
+    weights = signals.momentum_ls(prices, lookback=20)
+    if args.flip:
+        weights = -weights
+    mom = backtest.run(weights, prices, COST_BPS)
     hold = match_hold(prices, mom.ann_turnover)
     hold_bh = backtest.run(signals.equal_weight(prices), prices, COST_BPS)
 
@@ -55,9 +70,10 @@ def main() -> None:
     )
     p95 = np.percentile(null_sharpes, 95)
 
-    print(f"universe: {len(STOCKS)} stocks, {prices.index[0]:%Y-%m-%d} to {prices.index[-1]:%Y-%m-%d}")
+    print(f"universe: {len(stocks)} stocks, {prices.index[0]:%Y-%m-%d} to {prices.index[-1]:%Y-%m-%d}")
     print(f"cost assumption: {COST_BPS} bps per side; null hold={hold}d ({N_NULL} draws)\n")
-    print(f"momentum 20d L/S   {mom.summary()}")
+    name = "reversal 20d L/S " if args.flip else "momentum 20d L/S"
+    print(f"{name}  {mom.summary()}")
     print(f"buy and hold (EW)  {hold_bh.summary()}")
     print(
         f"random null        net sharpe p5/p50/p95: "

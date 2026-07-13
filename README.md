@@ -9,9 +9,14 @@ Early. The ingest layer works and data is accumulating; features and the backtes
 - [x] Daily OHLCV ingest (Yahoo chart API) into DuckDB, append-only with dedupe
 - [x] Vectorized backtester with cost model and no-lookahead tests
 - [x] Baselines: buy-and-hold, momentum, random signal at matched turnover
-- [x] First result: H1 (20d momentum) is dead, writeup in HYPOTHESES.md
-- [ ] Headline ingest
-- [ ] Feature engineering beyond momentum (vol, reversal, lags)
+- [x] Results so far (writeups in HYPOTHESES.md): H1 and H2 dead — 20d momentum
+      has no edge here at any universe size. H3 supported — the sign flips, and
+      short-term reversal is real gross (+0.49 Sharpe) but costs eat it entirely.
+- [x] Universe: ~S&P 100 (survivorship caveat documented in universe.txt)
+- [x] Headline ingest: scheduled RSS pulls committed to news/ every 6h, since
+      headlines can't be backfilled later
+- [x] CI: lint + tests on every push
+- [ ] H4: slower-rebalance / extreme-decile reversal variants
 - [ ] Walk-forward fitting harness for parameterized models
 - [ ] Sentiment features from headline embeddings
 

@@ -30,6 +30,16 @@ Every strategy is a date x ticker DataFrame of target close-of-day weights; the 
 
 A daily-redrawn random long-short churns ~2x the momentum signal and its costs bury it, which makes "beats random" free. The null now redraws every k days with k chosen as the smallest hold whose turnover is at or below the signal's. This moved the null's p95 net Sharpe from silly to plausible and is the difference between a real kill line and theater.
 
+## 2026-07-13: Universe widened to ~S&P 100; tickers are not stable identifiers
+
+H1's loudest caveat was the 10-name cross-section, so the universe is now roughly the current S&P 100. Two tickers 404ed on ingest: Marsh & McLennan and Fiserv, which turned out to have changed symbols (MMC to MRSH, FI to FISV). Lesson recorded because it generalizes: a ticker is a mutable label, not an identity, and any pipeline keyed on tickers silently drops or duplicates companies across renames. Proper fix is a security-master table with symbol history; out of scope until it bites something that matters.
+
+The widened universe is today's membership, hence survivorship-biased. Documented in universe.txt itself and carried as a standing caveat on every hypothesis, rather than pretended away.
+
+## 2026-07-13: Headlines land in committed JSONL, not the database
+
+Prices are backfillable at any time; headlines are not — Yahoo's RSS holds roughly 20 items per ticker, so history only exists if something was pulling it continuously. A scheduled GitHub Actions job pulls every 6 hours and commits monthly JSONL files under news/. The repo is the durable store because the DuckDB file is deliberately disposable; anything that can't be regenerated has to live in git. Volume is small text, so committing data is fine here.
+
 ## 2026-07-13: Start ingest before anything else
 
 History depth only grows with calendar time. Features and the backtester can be built against whatever has accumulated; the reverse isn't true.
