@@ -16,9 +16,11 @@ Early. The ingest layer works and data is accumulating; features and the backtes
 - [x] Headline ingest: scheduled RSS pulls committed to news/ every 6h, since
       headlines can't be backfilled later
 - [x] CI: lint + tests on every push
-- [ ] H4: slower-rebalance / extreme-decile reversal variants
-- [ ] Walk-forward fitting harness for parameterized models
-- [ ] Sentiment features from headline embeddings
+- [x] H4/H5: the best reversal variant is cost-breakeven (net Sharpe 0.01),
+      and walk-forward parameter selection makes it worse, not better
+- [x] Walk-forward harness with a leakage test on the train/test boundary
+- [ ] Sentiment features from headline embeddings — deferred until the news
+      archive is months deep; embedding three weeks of RSS proves nothing
 
 ## Ground rules
 
@@ -47,6 +49,7 @@ src/qsignals/ingest/      data pulls (Yahoo daily bars, CLI runner)
 src/qsignals/panel.py     bars -> wide date x ticker price panels
 src/qsignals/signals.py   strategies as target-weight panels
 src/qsignals/backtest.py  vectorized engine: shift(1), costs, Sharpe, drawdown
+src/qsignals/walkforward.py  rolling train/test parameter selection
 experiments/              one runnable script per hypothesis
 tests/                    pytest suite (incl. an explicit no-lookahead test)
 universe.txt              tickers under study

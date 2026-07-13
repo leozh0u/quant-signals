@@ -40,6 +40,14 @@ The widened universe is today's membership, hence survivorship-biased. Documente
 
 Prices are backfillable at any time; headlines are not — Yahoo's RSS holds roughly 20 items per ticker, so history only exists if something was pulling it continuously. A scheduled GitHub Actions job pulls every 6 hours and commits monthly JSONL files under news/. The repo is the durable store because the DuckDB file is deliberately disposable; anything that can't be regenerated has to live in git. Volume is small text, so committing data is fine here.
 
+## 2026-07-13: Walk-forward harness contract
+
+`walk_forward(prices, fit)` rolls a fixed train window and stitches out-of-sample weights; `fit` returns a strategy closure. The subtle line: inside a test window the strategy sees price history across the train/test boundary, because a 20-day lookback on day one of the test window legitimately reads the prior month. What must not cross the boundary is parameter choice, and a test pins that (each fit's last train date precedes every date it produces weights for). Conflating those two leakage types is how backtests quietly rot.
+
+## 2026-07-13: Sentiment layer deferred, on purpose
+
+The headline archive is weeks old. Embeddings over that would produce a writeup with no statistical content, so the NLP phase waits until the news cron has accumulated a few months. The deferral is the decision: shipping the feature now would look productive and mean nothing.
+
 ## 2026-07-13: Start ingest before anything else
 
 History depth only grows with calendar time. Features and the backtester can be built against whatever has accumulated; the reverse isn't true.
