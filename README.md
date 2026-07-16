@@ -4,13 +4,13 @@ Can news sentiment plus price history predict short-horizon equity moves? Probab
 
 ## Status
 
-Early. The ingest layer works and data is accumulating; features and the backtester come next.
+The ingest layer, backtester, and walk-forward harness are built, and five hypotheses have been tested and written up. Sentiment features wait on a deeper news archive.
 
 - [x] Daily OHLCV ingest (Yahoo chart API) into DuckDB, append-only with dedupe
 - [x] Vectorized backtester with cost model and no-lookahead tests
 - [x] Baselines: buy-and-hold, momentum, random signal at matched turnover
-- [x] Results so far (writeups in HYPOTHESES.md): H1 and H2 dead — 20d momentum
-      has no edge here at any universe size. H3 supported — the sign flips, and
+- [x] Results so far (writeups in HYPOTHESES.md): H1 and H2 dead; 20d momentum
+      has no edge here at any universe size. H3 supported: the sign flips, and
       short-term reversal is real gross (+0.49 Sharpe) but costs eat it entirely.
 - [x] Universe: ~S&P 100 (survivorship caveat documented in universe.txt)
 - [x] Headline ingest: scheduled RSS pulls committed to news/ every 6h, since
@@ -19,7 +19,7 @@ Early. The ingest layer works and data is accumulating; features and the backtes
 - [x] H4/H5: the best reversal variant is cost-breakeven (net Sharpe 0.01),
       and walk-forward parameter selection makes it worse, not better
 - [x] Walk-forward harness with a leakage test on the train/test boundary
-- [ ] Sentiment features from headline embeddings — deferred until the news
+- [ ] Sentiment features from headline embeddings, deferred until the news
       archive is months deep; embedding three weeks of RSS proves nothing
 
 ## Ground rules
