@@ -45,5 +45,7 @@ def test_too_little_data_raises():
 def test_momentum_rebalance_reduces_turnover():
     daily = signals.momentum_ls(PRICES, lookback=20)
     weekly = signals.momentum_ls(PRICES, lookback=20, rebalance=5)
-    t = lambda w: w.diff().abs().sum().sum()  # noqa: E731
+    def t(w):
+        return w.diff().abs().sum().sum()
+
     assert t(weekly) < t(daily) / 2

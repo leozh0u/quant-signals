@@ -12,7 +12,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
-    "ruff>=0.4",
+    # Capped: an unpinned ruff turns red on rules that did not exist when the
+    # code was written, which is how CI broke last time.
+    "ruff>=0.16,<0.17",
 ]
 
 [project.scripts]

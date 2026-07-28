@@ -56,7 +56,8 @@ def insert_bars(con: duckdb.DuckDBPyConnection, frame: pd.DataFrame) -> int:
     if frame.empty:
         return 0
 
-    staged = frame[BAR_COLUMNS]  # noqa: F841 - registered below by name
+    # Looks unused: DuckDB picks it up by name from the enclosing scope.
+    staged = frame[BAR_COLUMNS]
     con.register("staged", staged)
     before = con.execute("SELECT count(*) FROM bars").fetchone()[0]
     con.execute(

@@ -16,7 +16,7 @@ signal naturally consumes.
 
 from __future__ import annotations
 
-from typing import Callable
+from collections.abc import Callable
 
 import pandas as pd
 
